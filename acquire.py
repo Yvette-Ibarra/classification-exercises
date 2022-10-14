@@ -7,6 +7,7 @@ import env
 def get_connection(db, user=env.user, host=env.host, password=env.password):
     return f'mysql+pymysql://{user}:{password}@{host}/{db}'
 
+
 def get_titanic_data():
     filename = "titanic.csv"
 
@@ -47,21 +48,37 @@ def get_iris_data():
         return df 
 
 
-
- def gget_telco_data():   
-    filename = "telco.csv"
-
-    # if file is available locally, read it
-    if os.path.isfile(filename):
-        return pd.read_csv(filename)
+def new_telco_data():
+    '''
+    This function reads the telco data from the Codeup db into a df.
+    '''
+    sql_query = """
+                select * from customers
+                join contract_types using (contract_type_id)
+                join internet_service_types using (internet_service_type_id)
+                join payment_types using (payment_type_id)
+                """
     
-    # if file not available locally, acquire data from SQL database
-    # and write it as csv locally for future use
-    else:
-        df = pd.read_sql(' SELECT * FROM customers LEFT JOIN contract_types USING(contract_type_id) LEFT JOIN internet_service_types USING (internet_service_type_id) LEFT JOIN payment_types USING (payment_type_id);', get_connection('iris_db'))
-        # Write that dataframe to disk for later. Called "caching" the data for later.
+    # Read in DataFrame from Codeup db.
+    df = pd.read_sql(sql_query, get_connection('telco_churn'))
+    
+    return df
+def get_telco_data():
+    '''
+    This function reads in telco data from Codeup database, writes data to
+    a csv file if a local file does not exist, and returns a df.
+    '''
+    if os.path.isfile('telco.csv'):
         
-        df.to_csv(filename)
-
-        # Return the dataframe to the calling code
-        return df 
+        # If csv file exists read in data from csv file.
+        df = pd.read_csv('telco.csv', index_col=0)
+        
+    else:
+        
+        # Read fresh data from db into a DataFrame
+        df = new_telco_data()
+        
+        # Cache data
+        df.to_csv('telco.csv')
+        
+    return df
