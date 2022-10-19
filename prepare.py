@@ -16,16 +16,16 @@ def prep_iris(df):
     back into the original dataframe
     '''
     # use method to drop columns
-    iris_df.drop(columns = ['species_id','measurement_id'], inplace = True)
+    df.drop(columns = ['species_id','measurement_id'], inplace = True)
     
     # use method .rename to rename columns
-    iris_df.rename(columns={"species_name": "species"}, inplace = True)
+    df.rename(columns={"species_name": "species"}, inplace = True)
     
     # create dummy data frame that encodes the 3 unique species name
-    dummy_iris_df = pd.get_dummies(iris_df['species'], dummy_na = False)
+    dummy_iris_df = pd.get_dummies(df['species'], dummy_na = False)
     
     # concatenate the dummy_df with original data frame
-    new_iris_df = pd.concat([iris_df, dummy_iris_df], axis = 1)
+    new_iris_df = pd.concat([df, dummy_iris_df], axis = 1)
     
     return new_iris_df
 
