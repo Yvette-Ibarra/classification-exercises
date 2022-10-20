@@ -157,10 +157,12 @@ def prep_telco(df):
     '''
     
     # drop unnecessary : payment_type_id', 'internet_service_type_id', 'contract_type_id' 
-    telco_df.drop(columns=['payment_type_id', 'internet_service_type_id', 'contract_type_id' ])
+    df = df.drop(columns=['payment_type_id', 'internet_service_type_id', 'contract_type_id' ])
     
+    #convert total_charges to numeric data
+    df.total_charges = df.total_charges.replace(' ', np.nan).astype(float)
     # encode categorical drop_first set to False 'senior_citizen'gender','partner','dependents','phone_service','multiple_lines','online_security','online_backup','device_protection', 'tech_support','streaming_tv','streaming_movies','paperless_billing', 'total_charges', 'churn','contract_type','internet_service_type','payment_type'
-    dummy_df = pd.get_dummies(telco_df[['senior_citizen', 
+    dummy_df = pd.get_dummies(df[[
                                     'gender','partner',
                                     'dependents',
                                     'phone_service',
@@ -171,15 +173,14 @@ def prep_telco(df):
                                     'tech_support',
                                     'streaming_tv',
                                     'streaming_movies',
-                                    'paperless_billing', 
-                                    'total_charges', 
+                                    'paperless_billing',  
                                     'churn',
                                     'contract_type',
                                     'internet_service_type',
                                     'payment_type']], dummy_na=False, drop_first=[False])
     
     # Concatenate dummy_df to original data frame
-    df = pd.concat([telco_df, dummy_df], axis=1)
+    df = pd.concat([df, dummy_df], axis=1)
     
     return df
 
