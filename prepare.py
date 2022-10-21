@@ -74,13 +74,13 @@ def prep_titanic(df):
     '''
     
     # dropped columns 'embarked', 'pclass', 'passenger_id', 'deck
-    titanic_df.drop(columns = ['embarked', 'pclass', 'passenger_id', 'deck'], inplace = True)
+    df.drop(columns = ['embarked', 'pclass', 'passenger_id', 'deck'], inplace = True)
     
     # encode titanic dataframe for sex', 'class', 'embark_town
-    dummy_df = pd.get_dummies(titanic_df[['sex', 'class', 'embark_town']], dummy_na=False, drop_first=[False])
+    dummy_df = pd.get_dummies(df[['sex', 'class', 'embark_town']], dummy_na=False, drop_first=[False])
     
     # concatenate dummy data frame to original dataframe
-    df = pd.concat([titanic_df,dummy_df], axis=1)
+    df = pd.concat([df,dummy_df], axis=1)
 
     return df
 
@@ -173,11 +173,12 @@ def prep_telco(df):
                                     'tech_support',
                                     'streaming_tv',
                                     'streaming_movies',
-                                    'paperless_billing',  
+                                    'paperless_billing',
                                     'churn',
                                     'contract_type',
                                     'internet_service_type',
-                                    'payment_type']], dummy_na=False, drop_first=[False])
+                                    'payment_type']], dummy_na=False)
+
     
     # Concatenate dummy_df to original data frame
     df = pd.concat([df, dummy_df], axis=1)
@@ -195,6 +196,27 @@ def split_telco_data(df):
     train, validate = train_test_split(train_validate, test_size=.3, 
                                    random_state=123, 
                                    stratify=train_validate.churn)
+    return train, validate, test
+
+
+def impute_mean_total_charges(train, validate, test):
+    '''
+    This function imputes the mean of the total charge column for
+    observations with missing values.
+    Returns transformed train, validate, and test df.
+    '''
+    # create the imputer object with mean strategy
+    imputer = SimpleImputer(strategy = 'mean')
+    
+    # fit on and transform total_charges  column in train
+    train['total_charges'] = imputer.fit_transform(train[['total_charges']])
+    
+    # transform total_charges  column in validate
+    validate['total_charges'] = imputer.transform(validate[['total_charges']])
+    
+    # transform total_charges  column in test
+    test['total_charges'] = imputer.transform(test[['total_charges']])
+    
     return train, validate, test
 #---------------------- Function for train_validate_test---------------------
 def train_validate_test(df, target):
