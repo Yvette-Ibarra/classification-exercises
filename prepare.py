@@ -220,7 +220,7 @@ def impute_mean_total_charges(train, validate, test):
     return train, validate, test
 #---------------------- Function for train_validate_test---------------------
 def train_validate_test(df, target):
-    ''' This function takes in a dataframe and target variable to sratify and  slpits the data into 
+    ''' This function takes in a dataframe and target variable to sratify and  splits the data into 
     train , validate, test'''
     
     train, test = train_test_split(df, test_size=.2, random_state=123, stratify=df[target])
